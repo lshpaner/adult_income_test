@@ -5,15 +5,15 @@
 ##TODO: L.S. Create dummy ones for now and replace with actual values 
 
 # Set your project name (used for folder names, etc.)
-PROJECT_NAME = custom_project # define your project name here 
+PROJECT_NAME = custom_project
 # Specify the Python version to use (must match your local/environment version)
-PYTHON_VERSION =  3.10.12 # define Python version (e.g., 3.10.x)
+PYTHON_VERSION = 3.10.12
 # Command to invoke the Python interpreter (usually 'python' or 'python3')
 PYTHON_INTERPRETER = python
 # Name of the virtual environment directory
-VENV_DIR = custom_venv  # define your virtual environment directory name
+VENV_DIR = custom_venv
 # Name of the Conda environment (used in conda commands)
-CONDA_ENV_NAME = custom_conda  # define your conda environment name
+CONDA_ENV_NAME = custom_conda
 
 ############################## Training Globals ################################
 
@@ -54,6 +54,8 @@ init_config:
 		-e "s/^VENV_DIR = .*/VENV_DIR = $${venv_dir}/" \
 		-e "s/^CONDA_ENV_NAME = .*/CONDA_ENV_NAME = $${conda_env}/" \
 		Makefile; \
+	rm -f project; \
+	ln -sfn $${project_name} project; \
 	echo "Makefile updated successfully."
 
 .PHONY: check_vars
