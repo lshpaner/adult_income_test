@@ -56,6 +56,8 @@ init_config:
 		Makefile; \
 	echo "Makefile updated successfully."
 
+
+
 .PHONY: check_vars
 check_vars:
 	@echo "Dummy configuration detected."
