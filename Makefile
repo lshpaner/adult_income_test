@@ -5,7 +5,7 @@
 ##TODO: L.S. Create dummy ones for now and replace with actual values 
 
 # Set your project name (used for folder names, etc.)
-PROJECT_NAME =  custom_project # define your project name here 
+PROJECT_NAME = custom_project # define your project name here 
 # Specify the Python version to use (must match your local/environment version)
 PYTHON_VERSION =  3.10.12 # define Python version (e.g., 3.10.x)
 # Command to invoke the Python interpreter (usually 'python' or 'python3')
@@ -120,14 +120,16 @@ clean_dir:
 
 .PHONY: create_folders
 create_folders:
-	# Create data subdirectories
-	mkdir -p data/{external,interim,processed,raw}
-	# Create placeholder files to ensure Git tracks empty dirs
+# Create data subdirectories
+	mkdir -p data/external data/interim data/processed data/raw
+	mkdir -p "$(PROJECT_NAME)/modeling" "$(PROJECT_NAME)/preprocessing"
 	touch data/interim/.gitkeep
 	touch data/processed/.gitkeep
 	touch data/processed/inference.gitkeep
+	touch "$(PROJECT_NAME)/modeling/__init__.py"
+	touch "$(PROJECT_NAME)/preprocessing/__init__.py"
 
-	# Create models subdirectories for each outcome
+# Create models subdirectories for each outcome
 	@for outcome in $(OUTCOMES); do \
 		mkdir -p models/results/$$outcome; \
 		mkdir -p models/eval/$$outcome; \
