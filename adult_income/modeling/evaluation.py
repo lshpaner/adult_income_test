@@ -71,6 +71,7 @@ def main(
     X = pd.read_parquet(features_path)
     y = pd.read_parquet(labels_path)
     y = y.squeeze()  # coerce into a series
+
     ################################################################################
     # STEP 5: Split Data into Train, Validation, and Test Sets
     ################################################################################
