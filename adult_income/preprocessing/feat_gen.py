@@ -47,6 +47,9 @@ def main(
     ############################################################################
     ################ Step 4: Load Input Data ###################################
     ############################################################################
+    # df already loaded from .parquet
+    # Example:
+    # df = pd.read_parquet("path_to_file.parquet")
 
     # Read the input data file
     df = pd.read_parquet(input_data_file)
@@ -66,28 +69,24 @@ def main(
 
         ############### Store Final List of Features for Production ##
 
-        # Step 1: df already loaded from .parquet
-        # Example:
-        # df = pd.read_parquet("path_to_file.parquet")
-
-        # Step 2: Separate features (X) and target (y)
+        ## Separate features (X) and target (y)
         X = df.drop(columns=["income"]).copy()
         y = df[["income"]].copy()  # keep as DataFrame for now
 
-        # Step 4: Log first five rows of features and targets
+        ## Log first five rows of features and targets
         print(f"\n{'=' * 80}\nX\n{'=' * 80}\n{X.head()}")
         print(f"\n{'=' * 80}\ny\n{'=' * 80}\n{y.head()}")
 
-        # Step 5: Retain numeric columns only
+        ## Retain numeric columns only
         X = X.select_dtypes(include=np.number)
 
-        # Clean target column by removing trailing period
+        ## Clean target column by removing trailing period
         y.loc[:, "income"] = y["income"].str.rstrip(".")
 
-        # Step 9: Encode target to binary
+        ## Encode target to binary
         y = y["income"].map({"<=50K": 0, ">50K": 1})
 
-        # Step 8: Display class balance
+        ## Display class balance
         print(f"\nBreakdown of y:\n{y.value_counts()}\n")
         print(y)
 
@@ -116,7 +115,7 @@ def main(
 
         X = df[X_columns_list].copy()
 
-        # dropping "_missing" cols strings will be created next
+        # Dropping "_missing" cols strings will be created next
         X_columns_list = [col for col in X_columns_list if "_missing" not in col]
 
     ############################################################################
@@ -152,7 +151,7 @@ def main(
     print(f"\nFeature Space\n{X.head()}\n")
 
     ############################################################################
-    ################ Step 10: Generate Target Variable for Training #############
+    ################ Step 9: Generate Target Variable for Training #############
     ############################################################################
 
     if stage == "training":
@@ -163,7 +162,7 @@ def main(
         )
 
     ############################################################################
-    ################ Step 11: Save Processed Feature Space #####################
+    ################ Step 10: Save Processed Feature Space #####################
     ############################################################################
 
     # Save the feature space (X) and target variables (y) to parquet files
