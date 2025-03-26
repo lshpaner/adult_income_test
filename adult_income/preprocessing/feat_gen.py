@@ -6,9 +6,9 @@ import os
 import pandas as pd
 import typer
 
-from supportive_care.functions import mlflow_dumpArtifact, mlflow_loadArtifact
+from adult_income.functions import mlflow_dumpArtifact, mlflow_loadArtifact
 
-from supportive_care.constants import (
+from adult_income.constants import (
     target_death,
     var_index,
     epic_death,
@@ -63,7 +63,11 @@ def main(
         before = set(df.columns)
         X = df[[col for col in df.columns if "lead" not in col]].copy()
         X = X[
-            [col for col in X.columns if "death" not in col.lower() and col != epic_death]
+            [
+                col
+                for col in X.columns
+                if "death" not in col.lower() and col != epic_death
+            ]
         ].copy()
         after = set(X.columns)
         print(f"# of `death` and `lead` vars from DataFrame: {len(before - after)}")
@@ -121,13 +125,14 @@ def main(
         )
         print(f"\nShape of X: {X.shape} \n")
 
-
     # Append missing indicators to feature space
     X = pd.concat([X, X_missing], axis=1)
 
     print(f"New X Shape (after adding missingness indicators): {X.shape}")
     if stage == "inference":
-        print("\033[33mNumber of rows may vary due to Step 17 of `preprocessing.py`\033[0m")
+        print(
+            "\033[33mNumber of rows may vary due to Step 17 of `preprocessing.py`\033[0m"
+        )
     print("-" * 80)
     print(f"\nFeature Space\n{X.head()}\n")
 
