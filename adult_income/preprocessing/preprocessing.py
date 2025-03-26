@@ -54,7 +54,13 @@ def main(
     ############################################################################
     # Step 1. Read the input data file
     ############################################################################
-    df = pd.read_parquet(input_data_file).set_index(var_index)
+
+    df = pd.read_parquet(input_data_file)
+
+    try:
+        df.set_index(var_index)
+    except:
+        print("Index already set or 'var_index' doesn't exist in dataframe")
 
     if stage == "training":
 
@@ -397,7 +403,7 @@ def main(
         3. Columns that contain `"CCS"` but do not end with `"_CCS"`.
 
         The function combines these filtered column names, removes any duplicates 
-        using  NumPy’s `unique()` function, and returns the final list.
+        using  NumPy's `unique()` function, and returns the final list.
         """
     ############################################################################
 
@@ -414,3 +420,7 @@ def main(
     # Save out the dataframe to parquet file
     print(df_sans_zero_missing.shape)
     df_sans_zero_missing.reset_index().to_parquet(output_data_file)
+
+
+if __name__ == "__main__":
+    app()
