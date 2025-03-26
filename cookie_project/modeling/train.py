@@ -9,7 +9,7 @@ from model_tuner import Model
 # Step 1. Import Configurations and Constants
 ################################################################################
 
-from custom_project.config import (
+from cookie_project.config import (
     PROCESSED_DATA_DIR,
     model_definitions,
     stratify_list,
@@ -19,13 +19,13 @@ from custom_project.config import (
     numerical_cols,
     categorical_cols,
 )
-from custom_project.functions import (
+from cookie_project.functions import (
     clean_feature_selection_params,
     mlflow_log_parameters_model,
     adjust_preprocessing_pipeline,
     mlflow_load_model,
 )
-from custom_project.constants import var_index
+from cookie_project.constants import var_index
 
 app = typer.Typer()
 

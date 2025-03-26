@@ -14,7 +14,6 @@ mlflow_models_copy = "./mlruns/models_copy"
 
 artifact_data = "artifacts/"  # path to store mlflow artifacts
 profile_data = "profile_data"  # path to store pandas profiles in
-sql_path = "./preprocessing/sql_queries/"  # path to store sql queries in
 data_path = "data/processed/"
 
 
