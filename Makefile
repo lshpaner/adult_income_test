@@ -20,6 +20,12 @@ PIPELINES = orig under
 SCORING = average_precision
 PRETRAINED ?= 0  # 0 if you want to train the models, 1 if calibrate pretrained
 
+############################# Production Globals ###############################
+
+# Model outcome variable used in production 
+EXPLAN_OUTCOME = income # explainer outcome variable
+PROD_OUTCOME = income # production outcome variable
+
 
 # ------------------------------------------------------------------------------
 # COMMANDS

@@ -51,7 +51,9 @@ def find_best_model(
 
     # Get all runs for the experiment
     order_clause = (
-        f"metrics.`{metric_name}` DESC" if mode == "max" else f"metrics.`{metric_name}` ASC"
+        f"metrics.`{metric_name}` DESC"
+        if mode == "max"
+        else f"metrics.`{metric_name}` ASC"
     )
 
     runs = mlflow.search_runs(
