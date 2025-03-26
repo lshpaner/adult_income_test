@@ -74,9 +74,6 @@ def main(
         X = df.drop(columns=["income"]).copy()
         y = df[["income"]].copy()  # keep as DataFrame for now
 
-        # Step 3: Copy X to retrieve original features for stratification
-        stratify_df = X.copy()
-
         # Step 4: Log first five rows of features and targets
         print(f"\n{'=' * 80}\nX\n{'=' * 80}\n{X.head()}")
         print(f"\n{'=' * 80}\ny\n{'=' * 80}\n{y.head()}")
@@ -159,12 +156,11 @@ def main(
 
     if stage == "training":
         # Target variables from constants.py
-        y = df[target_outcome]
-        print(f"\nOutcomes (y): {y.to_list()}")
-        for target in target_outcome:
-            y[[target]].to_parquet(
-                os.path.join(data_path, f"y_{target}.parquet"),
-            )
+        y = df[[target_outcome]]
+        y.to_parquet(
+            os.path.join(data_path, f"y_{target_outcome}.parquet"),
+        )
+
     ############################################################################
     ################ Step 11: Save Processed Feature Space #####################
     ############################################################################

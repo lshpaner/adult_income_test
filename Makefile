@@ -126,11 +126,11 @@ clean_dir:
 .PHONY: create_folders
 create_folders:
 # Create data subdirectories
-	mkdir -p data/external data/interim data/processed data/raw
+	mkdir -p data/external data/interim data/processed data/raw data/processed/inference
 	mkdir -p "$(PROJECT_NAME)/modeling" "$(PROJECT_NAME)/preprocessing"
 	touch data/interim/.gitkeep
 	touch data/processed/.gitkeep
-	touch data/processed/inference.gitkeep
+	touch data/processed/inference/.gitkeep
 	touch "$(PROJECT_NAME)/modeling/__init__.py"
 	touch "$(PROJECT_NAME)/preprocessing/__init__.py"
 
