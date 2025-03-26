@@ -145,16 +145,16 @@ create_folders:
 ## Replace <cleaned_output_filename> with the name of the cleaned output file
 .PHONY: data_prep_preprocessing_training
 data_prep_preprocessing_training:
-	$(PYTHON_INTERPRETER) <your_project_dir>/preprocessing/preprocessing.py \
-	--input-data-file ./data/raw/<raw_input_filename>.parquet \
-	--output-data-file ./data/processed/<cleaned_output_filename>.parquet \
+	$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/preprocessing/preprocessing.py \
+	--input-data-file ./data/raw/df.parquet \
+	--output-data-file ./data/processed/df_sans_zero_missing.parquet \
 	--stage training \
 	--data-path ./data/processed
 
 .PHONY: feat_gen_training
 feat_gen_training:
-	$(PYTHON_INTERPRETER) <your_project_dir>/preprocessing/feat_gen.py \
-	--input-data-file ./data/processed/<cleaned_output_filename>.parquet \
+	$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/preprocessing/feat_gen.py \
+	--input-data-file ./data/processed/df_sans_zero_missing.parquet \
 	--stage training \
 	--data-path ./data/processed
 

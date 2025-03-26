@@ -21,12 +21,13 @@ data_path = "data/processed/"
 # Already one-hot encoded by data engineering team
 cat_vars = []
 
+
 ################################################################################
 ########################## Variable/DataFrame Constants ########################
 ################################################################################
 
-var_index = ""  # id index
-age = ""  # age 
+var_index = "census_id"  # id index
+age = "age"  # age
 age_bin = ""  # bin of ages for stratification only
 main_df = "df.parquet"  # main dataframe file name
 
@@ -35,6 +36,7 @@ miss_row_thresh = 0.5  # missingness threshold (rows) tolerated based on dev. se
 percent_miss = "percentage_missing"  # new col for percentage missing in rows
 miss_indicator = "missing_indicator"  # indicator for percentage missing (0,1)
 
+capital_gain = "capital-gain"
 ################################################################################
 
 # The below artificat name is used for preprocessing alone
