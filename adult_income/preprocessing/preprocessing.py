@@ -1,8 +1,6 @@
 ################################################################################
 ######################### Import Requisite Libraries ###########################
 import os
-
-# import sys
 import typer
 import pandas as pd
 
@@ -18,6 +16,7 @@ from adult_income.constants import (
     miss_col_thresh,
     miss_row_thresh,
     percent_miss,
+    perc_below_indiv,
 )
 
 # import all user-defined functions and constants
@@ -67,10 +66,10 @@ def main(
         )
 
         ########################################################################
-        # Step 3. String Columns Handling
+        # Step 2. String Columns Handling
         ########################################################################
-        # String columns are identified and removed before modeling because
-        # machine learning models typically require numerical inputs.
+        # String columns are identified and should be removed before modeling
+        # because machine learning models typically require numerical inputs.
         # Keeping string columns in the dataset may lead to errors or
         # unintended behavior unless explicitly encoded.
         #
@@ -82,7 +81,7 @@ def main(
         string_cols_list = df_object.columns.to_list()
 
         ########################################################################
-        # Step 4. Save and Log String Column List
+        # Step 3. Save and Log String Column List
         ########################################################################
         # Save the list of string columns for consistency across training and
         # inference and log them in MLflow for reproducibility.
@@ -111,11 +110,11 @@ def main(
     ############################################################################
 
     ########################################################################
-    # Step 5. Ensure Numeric Data and Feature Engineering
+    # Step 4. Ensure Numeric Data and Feature Engineering
     ########################################################################
     # Convert any possible numeric values that may have been incorrectly
     # classified as non-numeric. This avoids accidental labeling errors.
-    # Perform necessary feature transformations, such as:
+    # Perform necessary feature transformations (if and as applicable), such as:
     # - Deriving weight in pounds from kilograms
     # - Calculating height in feet using BMI and weight
     # - Dropping redundant features to prevent overfitting
@@ -125,29 +124,30 @@ def main(
     df = df.apply(lambda x: safe_to_numeric(x))
 
     ############################################################################
-    # Step 7. Process Preferred Language Feature
+    # Step 5. Process Additional Feature(s) (e.g., marital status)
     ############################################################################
-    # Identify the top 10 most frequent preferred languages and retain only these.
-    # Languages outside of the top 10 are replaced with a generic 'other' category.
-    # This step ensures a controlled feature space without excessive categories.
+    # Identify the top 10 most frequent marital status categories and retain only
+    # these. Less common categories are replaced with a generic 'other' label to
+    # maintain a controlled feature space and avoid overfitting due to rare
+    # categories.
     ############################################################################
 
     if stage == "training":
-        # Get the marital status
+        # Extract marital status feature
         marital_status = df["marital-status"]
 
         ############################################################################
-        # Step 8. Log Top 10 Preferred Languages and Replace Less Common Languages
+        # Step 6. Log Top 10 Marital Status Categories and Replace Rare Ones
         ############################################################################
 
         # Save the list of string columns for consistency across training and
-        # inference and log the top 10 preferred languages in MLflow and replace less
-        # common languages with a generic 'other' category to maintain a manageable
-        # feature space.
+        # inference. Log the top 10 most frequent marital status values using MLflow.
+        # Replace all other less common values with 'other' to simplify the feature
+        # space and improve generalizability.
 
         ############################################################################
 
-        # Dump the top_10 into a pickle file
+        # Dump the object into a pickle file
         dumpObjects(
             marital_status,
             os.path.join(data_path, "marital_status.pkl"),
@@ -163,14 +163,14 @@ def main(
     if stage == "inference":
 
         ########################################################################
-        # Load Previously Saved top10 Language List
+        # Load Previously Saved Object
         ########################################################################
-        # During training, we identified and stored top10 lang.
+        # During training, we identified and stored marital_status.
         # Now, we reload this to ensure that inference follows the same
         # preprocessing pipeline as training, maintaining consistency.
         ########################################################################
 
-        ## Load top10 from artifacts
+        ## Load marital_status from artifacts
         marital_status = mlflow_loadArtifact(
             experiment_name=exp_artifact_name,
             run_name=preproc_run_name,
@@ -178,7 +178,7 @@ def main(
         )
 
     ################################################################################
-    # Step 13. Zero Variance Columns
+    # Step 7. Zero Variance Columns
     ################################################################################
 
     # Select only numeric columns s/t .var() can be applied since you can only
@@ -202,7 +202,7 @@ def main(
         zero_varlist_list = list(zero_var.index)
 
         ########################################################################
-        # Step 14. Save and Log Zero Variance Columns List
+        # Step 8. Save and Log Zero Variance Columns List
         ########################################################################
         # Save the list of string columns for consistency across training and
         # inference and log them in MLflow for reproducibility.
@@ -234,7 +234,7 @@ def main(
         )
 
     ########################################################################
-    # Step 15. Remove zero variance cols from main df, and assign to new var
+    # Step 9. Remove zero variance cols from main df, and assign to new var
     # df_sans_zero
     ########################################################################
     df_sans_zero = df.drop(columns=zero_varlist_list)
@@ -248,8 +248,7 @@ def main(
     print()
 
     ############################################################################
-    # Step 16.Handle Missing Data
-    # This step references: ../notebooks/percent_below_60_patients.ipynb
+    # Step 10. Handle Missing Data
     ############################################################################
 
     # Calculate the percentage of missing values for each column in df_sans_zero
@@ -280,13 +279,6 @@ def main(
 
         # Select columns where less than 60% of the data is missing.
         """
-        To determine the columns where less than 60% of the data is missing, 
-        a notebook (../notebooks/percent_below_60_patients.ipynb) was created to 
-        compute the percentage of missing values for each column in the dataset.
-
-        A histogram was then generated to visualize the distribution of missing 
-        values across columns, with a red dashed line marking the 60% threshold.
-
         Filtering Columns Based on Missing Data Threshold
 
         Columns with more than 60% missing values were flagged for potential 
@@ -297,55 +289,54 @@ def main(
         60% of values are missing are removed.
 
         """
-        perc_below_60_patients = perc_missing_vals_per_col[
+        perc_below_indiv = perc_missing_vals_per_col[
             perc_missing_vals_per_col <= miss_col_thresh
         ].index.tolist()
 
-        # Dump the perc_below_60_patients into a pickle file
+        # Dump the perc_below_indiv into a pickle file
         dumpObjects(
-            perc_below_60_patients,
-            os.path.join(data_path, "perc_below_60_patients.pkl"),
+            perc_below_indiv,
+            os.path.join(data_path, f"{perc_below_indiv}.pkl"),
         )
 
         mlflow_dumpArtifact(
             experiment_name=exp_artifact_name,
             run_name=preproc_run_name,
-            obj_name="perc_below_60_patients",
-            obj=perc_below_60_patients,
+            obj_name=perc_below_indiv,
+            obj=perc_below_indiv,
         )
 
     if stage == "inference":
 
         ########################################################################
-        # Load Previously Saved Percentage Below 60 List
+        # Load Previously Saved Percentage Below Threshold List
         ########################################################################
 
-        # load perc_below_60_patients
-        perc_below_60_patients = mlflow_loadArtifact(
+        # load perc_below_indiv
+        perc_below_indiv = mlflow_loadArtifact(
             experiment_name=exp_artifact_name,
             run_name=preproc_run_name,
-            obj_name="perc_below_60_patients",
+            obj_name=perc_below_indiv,
         )
 
     # Create a new DataFrame including only columns where less than 60% of the
     # data is missing.
-    df_sans_zero_missing = df_sans_zero.loc[:, perc_below_60_patients]
+    df_sans_zero_missing = df_sans_zero.loc[:, perc_below_indiv]
 
     print(f"Sans Zero Missing 60% Missing Data: {df_sans_zero_missing.shape}")
 
     ############################################################################
-    # Step 17. Remove Missingness in Rows
-    # This step references: ../notebooks/percent_below_60_patients.ipynb
+    # Step 11. Remove Missingness in Rows
 
     # Filtering Rows Based on Missing Data and Specific Conditions
 
     # Once high-missing-value columns are removed, additional filtering is
     # applied at the row level. The goal is to remove rows that:
 
-    # 1. Have zero recorded values for a critical feature (death_date_presence).
+    # 1. Have zero recorded values for a critical feature (e.g., martial-status).
     # 2. Have a high percentage of missing values across all columns.
 
-    # Rows where death_date_presence == 0 and a large proportion of other data
+    # Rows where martial-status == 0 and a large proportion of other data
     # is missing (exceeding a predefined threshold miss_row_thresh) are removed.
 
     # This step ensures that rows with insufficient data for analysis are
@@ -382,33 +373,21 @@ def main(
 
         print(f"Number of rows removed: {rows_removed}")
 
-        ########################################################################
-        # Step 18. Days_To and HCC Logic
-
-        """
-        extract_relevant_days_hcc_ccs_columns(df)
-
-        This function identifies and extracts specific column names from a given 
-        DataFrame based on predefined substring conditions. The extracted column 
-        names are:
-
-        1. Columns that contain the substring `"Daysto"`.
-        2. Columns that contain `"HCC"` but do not end with `"_HCC"`.
-        3. Columns that contain `"CCS"` but do not end with `"_CCS"`.
-
-        The function combines these filtered column names, removes any duplicates 
-        using  NumPy's `unique()` function, and returns the final list.
-        """
     ############################################################################
-
-    # Combine the lists 'days_to', 'hcc', and 'ccs', and then use numpy's
-    # `unique` function to remove any duplicates. Convert the result into a list
-    # and store it in 'join_daysto_hcc_ccs'. This list now contains unique
-    # column names from all three lists.
+    # Step 12. Calculate Row-wise Missingness Percentage
+    ############################################################################
+    # This step computes the proportion of missing values for each row in the
+    # DataFrame. It helps identify rows with a high level of incompleteness, which
+    # may be useful for filtering, imputation strategies, or downstream analysis.
+    #
+    # A new column is added to `df_sans_zero_missing` where each value represents
+    # the percentage of columns that are missing for that row.
+    ############################################################################
 
     df_sans_zero_missing[percent_miss] = df_sans_zero_missing.isna().mean(axis=1)
+
     ############################################################################
-    # Step 19. Save Processed Data
+    # Step 13. Save Processed Data
     ############################################################################
 
     # Save out the dataframe to parquet file

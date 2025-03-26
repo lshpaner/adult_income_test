@@ -32,6 +32,7 @@ age_bin = ""  # bin of ages for stratification only
 main_df = "df.parquet"  # main dataframe file name
 
 miss_col_thresh = 60  # missingness threshold tolerated for zero-var cols
+perc_below_indiv = f"perc_below_{miss_col_thresh}_indiv"
 miss_row_thresh = 0.5  # missingness threshold (rows) tolerated based on dev. set
 percent_miss = "percentage_missing"  # new col for percentage missing in rows
 miss_indicator = "missing_indicator"  # indicator for percentage missing (0,1)
