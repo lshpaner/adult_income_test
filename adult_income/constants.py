@@ -25,8 +25,8 @@ cat_vars = []
 ########################## Variable/DataFrame Constants ########################
 ################################################################################
 
-var_index = ""  # patient id index
-age = ""  # age of patient
+var_index = ""  # id index
+age = ""  # age 
 age_bin = ""  # bin of ages for stratification only
 main_df = "df.parquet"  # main dataframe file name
 

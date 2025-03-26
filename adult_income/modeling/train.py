@@ -12,8 +12,6 @@ from model_tuner import Model
 from adult_income.config import (
     PROCESSED_DATA_DIR,
     model_definitions,
-    stratify_list,
-    bin_ages,
     rstate,
     pipelines,
     numerical_cols,
