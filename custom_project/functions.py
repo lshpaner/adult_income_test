@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 _ = load_dotenv(dotenv_path="project.env")  # tells Python linters you expect no return
 
 
-project_name = os.getenv("PROJECT_NAME")
+custom_project = os.getenv("PROJECT_NAME")
 
 import pandas as pd
 import numpy as np
@@ -39,7 +39,7 @@ from sklearn.metrics import (
 from sklearn.calibration import calibration_curve
 from tqdm import tqdm
 
-from project_name.constants import (
+from custom_project.constants import (
     mlflow_artifacts_data,
     mlflow_models_data,
 )

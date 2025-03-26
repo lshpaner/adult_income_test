@@ -19,11 +19,11 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 
-from supportive_care.constants import (
+from custom_project.constants import (
     exp_artifact_name,
     preproc_run_name,
 )
-from supportive_care.functions import mlflow_loadArtifact
+from custom_project.functions import mlflow_loadArtifact
 
 # Load environment variables from .env file if it exists
 load_dotenv()

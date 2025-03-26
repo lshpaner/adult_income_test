@@ -1,62 +1,62 @@
-#################################################################################
-# GLOBALS                                                                       #
-#################################################################################
-
-##TODO: L.S. Create dummy ones for now and replace with actual values 
-
-# Set your project name (used for folder names, etc.)
+# Makefile
+# ------------------------------------------------------------------------------
+# GLOBALS
+# ------------------------------------------------------------------------------
 PROJECT_NAME = custom_project
-# Specify the Python version to use (must match your local/environment version)
-PYTHON_VERSION = 3.10.12
-# Command to invoke the Python interpreter (usually 'python' or 'python3')
+PYTHON_VERSION = 3.11.12
 PYTHON_INTERPRETER = python
-# Name of the virtual environment directory
-VENV_DIR = custom_venv
-# Name of the Conda environment (used in conda commands)
-CONDA_ENV_NAME = custom_conda
+VENV_DIR = venv
+CONDA_ENV_NAME = conda
 
-############################## Training Globals ################################
+PROJECT_DIRECTORY = custom_project
 
-# Space-separated list of outcome variable names used in training
-OUTCOMES = outcome_1 outcome_2 
-# Pipeline types to run for training (e.g., different preprocessing strategies)
-# Define list of pipeline names (space-separated)
-PIPELINES = orig smote under orig_rfe smote_rfe under_rfe
-# Scoring method used for model selection/evaluation
-SCORING = average_precision# define scoring metric (e.g., average_precision)
-PRETRAINED ?= 0  # 0 if you want to train the models, 1 if calibrate pretrained
-
-############################# Production Globals ###############################
-
-# Outcome variable used for explanation tools (e.g., SHAP)
-# Define the outcome variable for explanation
-EXPLAN_OUTCOME =  outcome_1  
-# Outcome variable used for model prediction in production
-# Define the outcome variable for inference/prediction
-PROD_OUTCOME =  outcome_1 
-
-#################################################################################
-# COMMANDS                                                                      #
-#################################################################################
-
+# ------------------------------------------------------------------------------
+# COMMANDS
+# ------------------------------------------------------------------------------
 .PHONY: init_config
 init_config:
-	@read -p "Enter project name: " project_name; \
+	@CURRENT_DIR=$$(sed -n 's/^PROJECT_DIRECTORY = //p' Makefile); \
+	\
+	read -p "Enter project name: " project_name; \
 	read -p "Enter Python version (e.g., 3.10.12): " python_version; \
 	read -p "Enter Python interpreter (default: python): " python_interpreter; \
 	read -p "Enter virtual environment directory name: " venv_dir; \
 	read -p "Enter conda environment name: " conda_env; \
 	python_interpreter=$${python_interpreter:-python}; \
-	sed -i.bak \
-		-e "s/^PROJECT_NAME = .*/PROJECT_NAME = $${project_name}/" \
-		-e "s/^PYTHON_VERSION = .*/PYTHON_VERSION = $${python_version}/" \
-		-e "s/^PYTHON_INTERPRETER = .*/PYTHON_INTERPRETER = $${python_interpreter}/" \
-		-e "s/^VENV_DIR = .*/VENV_DIR = $${venv_dir}/" \
-		-e "s/^CONDA_ENV_NAME = .*/CONDA_ENV_NAME = $${conda_env}/" \
-		Makefile; \
-	rm -f project; \
-	ln -sfn $${project_name} project; \
-	echo "Makefile updated successfully."
+	\
+	if [ -d "$$CURRENT_DIR" ] && [ "$$CURRENT_DIR" != "$$project_name" ]; then \
+		mv "$$CURRENT_DIR" "$$project_name"; \
+	fi; \
+	\
+	# Cross-platform sed command (works on both macOS and Linux) \
+	if [ "$$(uname)" = "Darwin" ]; then \
+		sed -i '' \
+			-e "s/^PROJECT_NAME = .*/PROJECT_NAME = $${project_name}/" \
+			-e "s/^PYTHON_VERSION = .*/PYTHON_VERSION = $${python_version}/" \
+			-e "s/^PYTHON_INTERPRETER = .*/PYTHON_INTERPRETER = $${python_interpreter}/" \
+			-e "s/^VENV_DIR = .*/VENV_DIR = $${venv_dir}/" \
+			-e "s/^CONDA_ENV_NAME = .*/CONDA_ENV_NAME = $${conda_env}/" \
+			-e "s|^PROJECT_DIRECTORY = .*|PROJECT_DIRECTORY = $${project_name}|" \
+			Makefile; \
+	else \
+		sed -i \
+			-e "s/^PROJECT_NAME = .*/PROJECT_NAME = $${project_name}/" \
+			-e "s/^PYTHON_VERSION = .*/PYTHON_VERSION = $${python_version}/" \
+			-e "s/^PYTHON_INTERPRETER = .*/PYTHON_INTERPRETER = $${python_interpreter}/" \
+			-e "s/^VENV_DIR = .*/VENV_DIR = $${venv_dir}/" \
+			-e "s/^CONDA_ENV_NAME = .*/CONDA_ENV_NAME = $${conda_env}/" \
+			-e "s|^PROJECT_DIRECTORY = .*|PROJECT_DIRECTORY = $${project_name}|" \
+			Makefile; \
+	fi; \
+	\
+	# Replace project name in Python files and other text files only \
+	if [ "$$(uname)" = "Darwin" ]; then \
+		find "./$$project_name" -type f \( -name "*.py" -o -name "*.txt" -o -name "*.md" -o -name "*.yaml" -o -name "*.json" \) -exec sed -i '' "s/$$CURRENT_DIR/$$project_name/g" {} \;; \
+	else \
+		find "./$$project_name" -type f \( -name "*.py" -o -name "*.txt" -o -name "*.md" -o -name "*.yaml" -o -name "*.json" \) -exec sed -i "s/$$CURRENT_DIR/$$project_name/g" {} \;; \
+	fi; \
+	\
+	echo "Configuration updated successfully. Folder '$$CURRENT_DIR' -> '$$project_name'."
 
 .PHONY: check_vars
 check_vars:
