@@ -1,26 +1,6 @@
-################################################################################
-### Cookie Cutter Default Requirements
-################################################################################
-
-# local package
--e .
-
-# external requirements
-click
-Sphinx
-coverage
-awscli
-flake8
-
-# backwards compatibility
-pathlib2
-
-################################################################################
-### Specific Requirements
-################################################################################
-
 black==24.10.0
 eda_toolkit==0.0.15
+-e .
 loguru==0.7.3
 mlflow==2.19.0
 model_tuner==0.0.28b

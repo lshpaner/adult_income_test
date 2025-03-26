@@ -1,0 +1,250 @@
+from pathlib import Path
+
+import typer
+from loguru import logger
+import pandas as pd
+from model_tuner import Model
+
+################################################################################
+# Step 1. Import Configurations and Constants
+################################################################################
+
+from custom_project.config import (
+    PROCESSED_DATA_DIR,
+    model_definitions,
+    stratify_list,
+    bin_ages,
+    rstate,
+    pipelines,
+    numerical_cols,
+    categorical_cols,
+)
+from custom_project.functions import (
+    clean_feature_selection_params,
+    mlflow_log_parameters_model,
+    adjust_preprocessing_pipeline,
+    mlflow_load_model,
+)
+from custom_project.constants import var_index
+
+app = typer.Typer()
+
+################################################################################
+# Step 2. Define CLI Arguments with Default Values
+################################################################################
+
+
+@app.command()
+def main(
+    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ---
+    model_type: str = "lr",
+    pipeline_type: str = "orig",
+    outcome: str = "ISDEATHDATElead1yr",
+    features_path: Path = PROCESSED_DATA_DIR / "X.parquet",
+    labels_path: Path = PROCESSED_DATA_DIR / "y_ISDEATHDATElead1yr.parquet",
+    scoring: str = "average_precision",
+    pretrained: int = 0,
+    # -----------------------------------------
+):
+
+    ################################################################################
+    # Step 3. Load Feature and Label Datasets
+    ################################################################################
+
+    X = pd.read_parquet(features_path)  # read in X
+    y = pd.read_parquet(labels_path)  # read in y
+    y = y.squeeze()  # coerce into a series
+
+    ################################################################################
+    # Step 4. Retrieve Model and Pipeline Configurations
+    ################################################################################
+
+    clc = model_definitions[model_type]["clc"]
+    estimator_name = model_definitions[model_type]["estimator_name"]
+    pipeline_steps = pipelines[pipeline_type]["pipeline"]
+    sampler = pipelines[pipeline_type]["sampler"]
+    feature_selection = pipelines[pipeline_type]["feature_selection"]
+
+    # Set the parameters
+    tuned_parameters = model_definitions[model_type]["tuned_parameters"]
+    randomized_grid = model_definitions[model_type]["randomized_grid"]
+    n_iter = model_definitions[model_type]["n_iter"]
+    early_stop = model_definitions[model_type]["early"]
+
+    print("Sampler", sampler)
+
+    ################################################################################
+    # Step 5. Clean up pipeline
+    # Step 5a. Clean up tuned_parameters by removing feature selection keys if
+    # RFE isn't in the pipeline
+    ################################################################################
+    clean_feature_selection_params(pipeline_steps, tuned_parameters)
+
+    # Step 5b. Adjust preproc. pipe. to skip imputer and scaler for 'rf', 'xgb', 'cat'
+
+    pipeline_steps = adjust_preprocessing_pipeline(
+        model_type,
+        pipeline_steps,
+        numerical_cols,
+        categorical_cols,
+        sampler=sampler,
+    )
+
+    ################################################################################
+    # Step 6. Create Stratified Dataset Based on Demographic Columns
+    ################################################################################
+
+    # Create a dataframe that includes the specified stratification columns
+    # (age bins (if provided), sex, and race/ethnicity). This function is necessary
+    # because simple stratification by a list of columns doesn’t suffice when we
+    # need to simultaneously stratify by multiple variables—age, sex, and
+    # race/ethnicity, with specific requirements. Age must be binned into discrete
+    # groups rather than treated as a continuous variable, as the data distribution
+    # across a broad age range is sparse and uneven. This function allows us to
+    # combine these factors into a single DataFrame, enabling downstream analysis
+    # (e.g., statistical modeling or reporting) that requires consistent
+    # stratification across all specified dimensions. The patient_id (set to
+    # var_index, typically 'PatientID') ensures proper alignment of records
+    # across joins, preserving data integrity.
+
+    stratify_df = create_stratified_other_column(
+        X=X,
+        stratify_list=stratify_list,
+        age=age,
+        age_bin=age_bin,
+        bin_ages=bin_ages,
+        patient_id=var_index,
+    )
+
+    print()
+    print(f"Supportive Care Outcome:")
+    print("-" * 60)
+    print()
+    print("=" * 60)
+    print(f"{outcome}")
+    print("=" * 60)
+
+    ################################################################################
+    # Step 7. Define and Initialize the Model Pipeline
+    ################################################################################
+
+    logger.info(f"Training {estimator_name} for {outcome} ...")
+
+    if pretrained:
+
+        print("Loading Pretrained Model...")
+        model = mlflow_load_model(
+            experiment_name=f"{outcome}_model",
+            run_name=f"{estimator_name}_{pipeline_type}_training",
+            model_name=f"{estimator_name}_{outcome}",
+        )
+
+    else:
+        model = Model(
+            pipeline_steps=pipeline_steps,
+            name=estimator_name,
+            model_type="classification",
+            estimator_name=estimator_name,
+            calibrate=True,
+            estimator=clc,
+            kfold=False,
+            grid=tuned_parameters,
+            n_jobs=5,
+            randomized_grid=randomized_grid,
+            n_iter=n_iter,
+            scoring=[scoring],
+            random_state=rstate,
+            stratify_cols=stratify_df,
+            stratify_y=True,
+            boost_early=early_stop,
+            imbalance_sampler=sampler,
+            feature_selection=feature_selection,
+        )
+
+        ################################################################################
+        # Step 8. Perform Hyperparameter Tuning
+        ################################################################################
+
+        model.grid_search_param_tuning(X, y, f1_beta_tune=True, betas=[1])
+
+        ################################################################################
+        # Step 9. Extract Training, Validation, and Test Splits
+        ################################################################################
+
+    X_train, y_train = model.get_train_data(X, y)
+    X_valid, y_valid = model.get_valid_data(X, y)
+
+    ################################################################################
+    # Step 10. Train the Model
+    ################################################################################
+
+    # Boosting algorithms like XGBoost and CatBoost benefit from validation data
+    # during training to optimize early stopping and prevent overfitting.
+    # Hence, we explicitly provide the validation dataset in the `fit` method
+    # for these models. For other models, validation data is not required at this
+    # stage.
+
+    if not pretrained:
+        if model_type in {"xgb", "cat"}:
+            model.fit(
+                X_train,
+                y_train,
+                validation_data=(X_valid, y_valid),
+                score=scoring,
+            )
+        else:
+            model.fit(
+                X_train,
+                y_train,
+                score=scoring,
+            )
+
+    ################################################################################
+    # Step 11. Calibrate the Model If Necessary
+    ################################################################################
+
+    ## If we need to update isotonic method
+    model.calibration_method = "isotonic"
+
+    if model.calibrate:
+        model.calibrateModel(X, y, score=scoring)
+
+    ################################################################################
+    # Step 12. See Results in Terminal and Store Model in MLFlow
+    ################################################################################
+
+    # see the results printed to the terminal for reference
+    model.return_metrics(
+        X=X_valid,
+        y=y_valid,
+        optimal_threshold=True,
+        print_threshold=True,
+        model_metrics=True,
+    )
+    if pretrained:
+        mlflow_log_parameters_model(
+            experiment_name=f"{outcome}_model",
+            run_name=f"{estimator_name}_{pipeline_type}_training",
+            model_name=f"{estimator_name}_{outcome}",
+            model=model,
+        )
+
+    else:
+        mlflow_log_parameters_model(
+            model_type=model_type,
+            n_iter=n_iter,
+            kfold=False,
+            outcome=outcome,
+            experiment_name=f"{outcome}_model",
+            run_name=f"{estimator_name}_{pipeline_type}_training",
+            model_name=f"{estimator_name}_{outcome}",
+            model=model,
+            hyperparam_dict=model.best_params_per_score[scoring],
+        )
+
+    logger.success("Modeling training complete.")
+    # -----------------------------------------
+
+
+if __name__ == "__main__":
+    app()

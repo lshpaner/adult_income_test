@@ -3,7 +3,7 @@
 # GLOBALS
 # ------------------------------------------------------------------------------
 PROJECT_NAME = custom_project
-PYTHON_VERSION = 3.11.12
+PYTHON_VERSION = 3.10.12
 PYTHON_INTERPRETER = python
 VENV_DIR = venv
 CONDA_ENV_NAME = conda
