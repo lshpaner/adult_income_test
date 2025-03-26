@@ -129,7 +129,6 @@ def main(
             n_iter=n_iter,
             scoring=[scoring],
             random_state=rstate,
-            # stratify_cols=["race"],
             stratify_y=True,
             boost_early=early_stop,
             imbalance_sampler=sampler,

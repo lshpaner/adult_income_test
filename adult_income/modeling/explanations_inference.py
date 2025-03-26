@@ -63,7 +63,7 @@ def main(
     X = pd.read_parquet(features_path)
 
     ################################################################################
-    # STEP 6: Prepare the pipeline and transform data
+    # STEP 5: Prepare the pipeline and transform data
     ################################################################################
 
     # Retrieve pipeline steps using built-in model_tuner getter
@@ -72,7 +72,7 @@ def main(
     )
 
     ################################################################################
-    # STEP 7: Load SHAP explainer
+    # STEP 6: Load SHAP explainer
     ################################################################################
 
     # Load the SHAP explainer from artifact saved in explainer.py
@@ -85,7 +85,7 @@ def main(
     )
 
     ################################################################################
-    # STEP 8: Compute SHAP values w/ progress bar
+    # STEP 7: Compute SHAP values w/ progress bar
     ################################################################################
     print("Computing SHAP values...")
     with tqdm(total=X.shape[0], desc="SHAP Explaining") as pbar:
@@ -93,7 +93,7 @@ def main(
         pbar.update(X.shape[0])
 
     ################################################################################
-    # STEP 9: Process SHAP results
+    # STEP 8: Process SHAP results
     ################################################################################
 
     # Extract transformed feature names from the preprocessing pipeline
@@ -107,7 +107,7 @@ def main(
     )
 
     ################################################################################
-    # STEP 10: Extract top n SHAP features
+    # STEP 9: Extract top n SHAP features
     ################################################################################
     print(f"Extracting Top {top_n} SHAP features per patient...")
 
@@ -118,7 +118,7 @@ def main(
     )
 
     ################################################################################
-    # STEP 11: Create SHAP DataFrame
+    # STEP 10: Create SHAP DataFrame
     ################################################################################
 
     shap_df = pd.DataFrame(index=X.index)
@@ -139,7 +139,7 @@ def main(
         )
 
     ################################################################################
-    # STEP 12: Add confusion matrix and predictions metrics to dataframe
+    # STEP 11: Add confusion matrix and predictions metrics to dataframe
     ################################################################################
     # Generate predictions and predicted probabilities on X
     y_pred = model.predict(X, optimal_threshold=True)
@@ -150,7 +150,7 @@ def main(
     shap_df["y_pred_proba"] = y_pred_proba
 
     ################################################################################
-    # STEP 13: Save results to CSV
+    # STEP 12: Save results to CSV
     ################################################################################
     shap_df.to_csv(explanations_path, index=True)
     print(f"Results saved to '{explanations_path}'")
