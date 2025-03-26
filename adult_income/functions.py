@@ -34,7 +34,7 @@ from sklearn.metrics import (
 from sklearn.calibration import calibration_curve
 from tqdm import tqdm
 
-from cookie_project.constants import (
+from adult_income.constants import (
     mlflow_artifacts_data,
     mlflow_models_data,
 )

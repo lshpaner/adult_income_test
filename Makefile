@@ -2,12 +2,12 @@
 # ------------------------------------------------------------------------------
 # GLOBALS
 # ------------------------------------------------------------------------------
-PROJECT_NAME = cookie_project
-PYTHON_VERSION = 3.10.12
+PROJECT_NAME = adult_income
+PYTHON_VERSION = 3.11
 PYTHON_INTERPRETER = python
-VENV_DIR = cookie_venv
-CONDA_ENV_NAME = cookie_conda
-PROJECT_DIRECTORY = cookie_project
+VENV_DIR = adult_venv
+CONDA_ENV_NAME = adult_conda
+PROJECT_DIRECTORY = adult_income
 
 # ------------------------------------------------------------------------------
 # COMMANDS

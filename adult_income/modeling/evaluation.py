@@ -8,7 +8,7 @@ import numpy as np
 from model_tuner import find_optimal_threshold_beta
 
 # Import supportive care functions and constants
-from cookie_project.functions import (
+from adult_income.functions import (
     mlflow_load_model,
     return_model_metrics,
     return_model_plots,
@@ -16,7 +16,7 @@ from cookie_project.functions import (
     mlflow_log_parameters_model,
 )
 
-from cookie_project.config import (
+from adult_income.config import (
     PROCESSED_DATA_DIR,
     model_definitions,
     target_precision,

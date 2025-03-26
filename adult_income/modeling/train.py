@@ -9,7 +9,7 @@ from model_tuner import Model
 # Step 1. Import Configurations and Constants
 ################################################################################
 
-from cookie_project.config import (
+from adult_income.config import (
     PROCESSED_DATA_DIR,
     model_definitions,
     stratify_list,
@@ -19,13 +19,13 @@ from cookie_project.config import (
     numerical_cols,
     categorical_cols,
 )
-from cookie_project.functions import (
+from adult_income.functions import (
     clean_feature_selection_params,
     mlflow_log_parameters_model,
     adjust_preprocessing_pipeline,
     mlflow_load_model,
 )
-from cookie_project.constants import var_index
+from adult_income.constants import var_index
 
 app = typer.Typer()
 

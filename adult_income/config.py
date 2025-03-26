@@ -19,11 +19,11 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 
-from cookie_project.constants import (
+from adult_income.constants import (
     exp_artifact_name,
     preproc_run_name,
 )
-from cookie_project.functions import mlflow_loadArtifact
+from adult_income.functions import mlflow_loadArtifact
 
 # Load environment variables from .env file if it exists
 load_dotenv()
