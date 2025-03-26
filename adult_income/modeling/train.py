@@ -37,9 +37,9 @@ def main(
     # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ---
     model_type: str = "lr",
     pipeline_type: str = "orig",
-    outcome: str = "ISDEATHDATElead1yr",
+    outcome: str = "default_outcome",
     features_path: Path = PROCESSED_DATA_DIR / "X.parquet",
-    labels_path: Path = PROCESSED_DATA_DIR / "y_ISDEATHDATElead1yr.parquet",
+    labels_path: Path = PROCESSED_DATA_DIR / "y.parquet",
     scoring: str = "average_precision",
     pretrained: int = 0,
     # -----------------------------------------
@@ -87,35 +87,14 @@ def main(
         categorical_cols,
         sampler=sampler,
     )
-
+    
     ################################################################################
-    # Step 6. Create Stratified Dataset Based on Demographic Columns
+    # Step 6. Printing Outcome
     ################################################################################
 
-    # Create a dataframe that includes the specified stratification columns
-    # (age bins (if provided), sex, and race/ethnicity). This function is necessary
-    # because simple stratification by a list of columns doesn’t suffice when we
-    # need to simultaneously stratify by multiple variables—age, sex, and
-    # race/ethnicity, with specific requirements. Age must be binned into discrete
-    # groups rather than treated as a continuous variable, as the data distribution
-    # across a broad age range is sparse and uneven. This function allows us to
-    # combine these factors into a single DataFrame, enabling downstream analysis
-    # (e.g., statistical modeling or reporting) that requires consistent
-    # stratification across all specified dimensions. The patient_id (set to
-    # var_index, typically 'PatientID') ensures proper alignment of records
-    # across joins, preserving data integrity.
-
-    stratify_df = create_stratified_other_column(
-        X=X,
-        stratify_list=stratify_list,
-        age=age,
-        age_bin=age_bin,
-        bin_ages=bin_ages,
-        patient_id=var_index,
-    )
 
     print()
-    print(f"Supportive Care Outcome:")
+    print(f"Outcome:")
     print("-" * 60)
     print()
     print("=" * 60)
@@ -152,7 +131,6 @@ def main(
             n_iter=n_iter,
             scoring=[scoring],
             random_state=rstate,
-            stratify_cols=stratify_df,
             stratify_y=True,
             boost_early=early_stop,
             imbalance_sampler=sampler,
@@ -201,8 +179,8 @@ def main(
     # Step 11. Calibrate the Model If Necessary
     ################################################################################
 
-    ## If we need to update isotonic method
-    model.calibration_method = "isotonic"
+    # ## If we need to update isotonic method
+    # model.calibration_method = "isotonic"
 
     if model.calibrate:
         model.calibrateModel(X, y, score=scoring)
