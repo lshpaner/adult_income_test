@@ -107,19 +107,6 @@ clean:
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
-## Lint using flake8 and black (use `make format` to do formatting)
-.PHONY: lint
-lint:
-	flake8 supportive_care
-	isort --check --diff --profile black supportive_care
-	black --check --config pyproject.toml supportive_care
-
-## Format source code with black
-.PHONY: format
-format:
-	black --config pyproject.toml supportive_care
-
-
 #################################################################################
 # PROJECT RULES                                                                 #
 #################################################################################
@@ -184,7 +171,7 @@ train_logistic_regression:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
 			mkdir -p models/results/$$outcome; \
-			"$(PYTHON_INTERPRETER)" supportive_care/modeling/train.py \
+			"$(PYTHON_INTERPRETER)" $(PROJECT_DIRECTORY)/modeling/train.py \
 				--model-type lr \
 				--pipeline-type "$$pipeline" \
 				--labels-path ./data/processed/y_$$outcome.parquet \
@@ -200,7 +187,7 @@ train_random_forest:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
 			mkdir -p models/results/$$outcome; \
-			"$(PYTHON_INTERPRETER)" supportive_care/modeling/train.py \
+			"$(PYTHON_INTERPRETER)" $(PROJECT_DIRECTORY)/modeling/train.py \
 				--model-type rf \
 				--pipeline-type "$$pipeline" \
 				--labels-path ./data/processed/y_$$outcome.parquet \
@@ -216,7 +203,7 @@ train_xgboost:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
 			mkdir -p models/results/$$outcome; \
-			"$(PYTHON_INTERPRETER)" supportive_care/modeling/train.py \
+			"$(PYTHON_INTERPRETER)" $(PROJECT_DIRECTORY)/modeling/train.py \
 				--model-type xgb \
 				--pipeline-type "$$pipeline" \
 				--labels-path ./data/processed/y_$$outcome.parquet \
@@ -232,7 +219,7 @@ train_catboost:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
 			mkdir -p models/results/$$outcome; \
-			"$(PYTHON_INTERPRETER)" supportive_care/modeling/train.py \
+			"$(PYTHON_INTERPRETER)" $(PROJECT_DIRECTORY)/modeling/train.py \
 				--model-type cat \
 				--pipeline-type "$$pipeline" \
 				--labels-path ./data/processed/y_$$outcome.parquet \
@@ -252,7 +239,7 @@ train_all_models: train_logistic_regression train_random_forest train_xgboost tr
 eval_logistic_regression:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
-			$(PYTHON_INTERPRETER) supportive_care/modeling/evaluation.py \
+			$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/evaluation.py \
 			--model-type lr \
 			--pipeline-type $$pipeline \
 			--labels-path ./data/processed/y_$$outcome.parquet \
@@ -265,7 +252,7 @@ eval_logistic_regression:
 eval_random_forest:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
-			$(PYTHON_INTERPRETER) supportive_care/modeling/evaluation.py \
+			$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/evaluation.py \
 			--model-type rf \
 			--pipeline-type $$pipeline \
 			--labels-path ./data/processed/y_$$outcome.parquet \
@@ -278,7 +265,7 @@ eval_random_forest:
 eval_xgboost:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
-			$(PYTHON_INTERPRETER) supportive_care/modeling/evaluation.py \
+			$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/evaluation.py \
 			--model-type xgb \
 			--pipeline-type $$pipeline \
 			--labels-path ./data/processed/y_$$outcome.parquet \
@@ -291,7 +278,7 @@ eval_xgboost:
 eval_catboost:
 	@for outcome in $(OUTCOMES); do \
 		for pipeline in $(PIPELINES); do \
-			$(PYTHON_INTERPRETER) supportive_care/modeling/evaluation.py \
+			$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/evaluation.py \
 			--model-type cat \
 			--pipeline-type $$pipeline \
 			--labels-path ./data/processed/y_$$outcome.parquet \
@@ -309,7 +296,7 @@ eval_all_models: eval_logistic_regression eval_random_forest eval_xgboost eval_c
 .PHONY: model_explainer
 model_explainer:
 	@for outcome in $(EXPLAN_OUTCOME); do \
-		$(PYTHON_INTERPRETER) supportive_care/modeling/explainer.py \
+		$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/explainer.py \
 			--outcome $$outcome \
 			--metric-name "valid Average Precision" \
 			--mode max; \
@@ -318,7 +305,7 @@ model_explainer:
 .PHONY: model_explanations_training
 model_explanations_training:
 	@for outcome in $(EXPLAN_OUTCOME); do \
-		$(PYTHON_INTERPRETER) supportive_care/modeling/explanations_training.py \
+		$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/explanations_training.py \
 			--features-path ./data/processed/X.parquet \
 			--labels-path ./data/processed/y_$$outcome.parquet \
 			--outcome $$outcome \
@@ -334,7 +321,7 @@ model_explaining_training: model_explainer model_explanations_training
 .PHONY: model_explanations_inference
 model_explanations_inference:
 	@for outcome in $(EXPLAN_OUTCOME); do \
-		$(PYTHON_INTERPRETER) supportive_care/modeling/explanations_inference.py \
+		$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/explanations_inference.py \
 			--features-path ./data/processed/inference/X.parquet \
 			--outcome $$outcome \
 			--metric-name "valid Average Precision" \
@@ -351,7 +338,7 @@ model_explanations_inference:
 
 .PHONY: data_prep_preprocessing_inference
 data_prep_preprocessing_inference:
-	$(PYTHON_INTERPRETER) supportive_care/preprocessing/preprocessing.py \
+	$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/preprocessing/preprocessing.py \
 	--input-data-file ./data/raw/df.parquet \
 	--output-data-file ./data/processed/inference/df_inference_process.parquet \
 	--stage inference \
@@ -359,7 +346,7 @@ data_prep_preprocessing_inference:
 
 .PHONY: feat_gen_inference
 feat_gen_inference: 
-	$(PYTHON_INTERPRETER) supportive_care/preprocessing/feat_gen.py \
+	$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/preprocessing/feat_gen.py \
 	--input-data-file ./data/processed/inference/df_inference_process.parquet \
 	--stage inference \
 	--data-path ./data/processed/inference
@@ -367,7 +354,7 @@ feat_gen_inference:
 .PHONY: predict
 predict:
 	@for outcome in $(PROD_OUTCOME); do \
-		$(PYTHON_INTERPRETER) supportive_care/modeling/predict.py \
+		$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/modeling/predict.py \
 			--input-data-file data/processed/inference/X.parquet \
 			--predictions-path ./data/processed/inference/predictions_$$outcome.csv \
 			--outcome $$outcome \
