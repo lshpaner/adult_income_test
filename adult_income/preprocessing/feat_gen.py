@@ -4,16 +4,16 @@
 
 import os
 import pandas as pd
+import numpy as np
 import typer
 
 from adult_income.functions import mlflow_dumpArtifact, mlflow_loadArtifact
 
 from adult_income.constants import (
-    target_death,
     var_index,
-    epic_death,
     exp_artifact_name,
     preproc_run_name,
+    target_outcome,
 )
 
 ################################################################################
@@ -49,7 +49,12 @@ def main(
     ############################################################################
 
     # Read the input data file
-    df = pd.read_parquet(input_data_file).set_index(var_index)
+    df = pd.read_parquet(input_data_file)
+
+    try:
+        df.set_index(var_index)
+    except:
+        print("Index already set or 'var_index' doesn't exist in dataframe")
     print("-" * 80)
     print(f"# of DataFrame Columns: {df.shape[1]}")
 
@@ -58,23 +63,35 @@ def main(
     ############################################################################
 
     if stage == "training":
-        # Filter features: exclude columns with 'lead' and death-related terms,
-        # except epic_death
-        before = set(df.columns)
-        X = df[[col for col in df.columns if "lead" not in col]].copy()
-        X = X[
-            [
-                col
-                for col in X.columns
-                if "death" not in col.lower() and col != epic_death
-            ]
-        ].copy()
-        after = set(X.columns)
-        print(f"# of `death` and `lead` vars from DataFrame: {len(before - after)}")
-        print(f"Resulting # of Columns in X:  {X.shape[1]}")
-        print("-" * 80)
 
         ############### Store Final List of Features for Production ##
+
+        # Step 1: df already loaded from .parquet
+        # Example:
+        # df = pd.read_parquet("path_to_file.parquet")
+
+        # Step 2: Separate features (X) and target (y)
+        X = df.drop(columns=["income"]).copy()
+        y = df[["income"]].copy()  # keep as DataFrame for now
+
+        # Step 3: Copy X to retrieve original features for stratification
+        stratify_df = X.copy()
+
+        # Step 4: Log first five rows of features and targets
+        print(f"\n{'=' * 80}\nX\n{'=' * 80}\n{X.head()}")
+        print(f"\n{'=' * 80}\ny\n{'=' * 80}\n{y.head()}")
+
+        # Step 5: Retain numeric columns only
+        X = X.select_dtypes(include=np.number)
+
+        # Step 7: Clean target column by removing trailing period
+        y["income"] = y["income"].str.rstrip(".")
+
+        # Step 8: Display class balance
+        print(f"\nBreakdown of y:\n{y['income'].value_counts()}\n")
+
+        # Step 9: Encode target to binary
+        y = y["income"].map({"<=50K": 0, ">50K": 1})
 
         X_columns_list = X.columns.to_list()
 
@@ -142,9 +159,9 @@ def main(
 
     if stage == "training":
         # Target variables from constants.py
-        y = df[target_death]
-        print(f"\nOutcomes (y): {y.columns.to_list()}")
-        for target in target_death:
+        y = df[target_outcome]
+        print(f"\nOutcomes (y): {y.to_list()}")
+        for target in target_outcome:
             y[[target]].to_parquet(
                 os.path.join(data_path, f"y_{target}.parquet"),
             )

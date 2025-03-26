@@ -52,3 +52,9 @@ artifact_name = "preprocessing"
 shap_artifact_name = "explainer"
 shap_run_name = "explainer"
 shap_artifacts_data = "./mlruns/explainer"
+
+
+################################################################################
+############################### Target Outcome #################################
+
+target_outcome = "income"
