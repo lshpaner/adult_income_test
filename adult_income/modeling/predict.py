@@ -27,6 +27,7 @@ def find_best_model(
     experiment_name: str,
     metric_name: str,
     mode: str = "max",
+    mlruns_location: str = None,
 ) -> str:
     """
     Finds the best model from a given MLflow experiment based on a specified
@@ -40,7 +41,9 @@ def find_best_model(
     :raises ValueError: If the experiment does not exist.
     """
     # Get experiment by name
-    abs_mlflow_data = os.path.abspath(mlflow_models_data)
+    if mlruns_location is None:
+        abs_mlflow_data = os.path.abspath(mlflow_models_data)
+
     mlflow.set_tracking_uri(f"file://{abs_mlflow_data}")
 
     experiment = mlflow.get_experiment_by_name(experiment_name)
@@ -81,7 +84,7 @@ def main(
     # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
     input_data_file: Path = PROCESSED_DATA_DIR_INFER / "X.parquet",
     predictions_path: Path = "predictions.csv",
-    outcome: str = "default_outcome",
+    outcome: str = "outcome",
     metric_name: str = "valid AUC ROC",  # Metric to select the best model
     mode: str = "max",  # max for metrics where higher is better, min otherwise
     # -----------------------------------------

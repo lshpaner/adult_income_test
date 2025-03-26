@@ -76,7 +76,7 @@ rfe = RFE(
 ################################################################################
 # This section here is for categorical variables
 
-categorical_cols = []
+categorical_cols = ["race", "sex"]
 
 # Load feature column names from Mlflow
 try:

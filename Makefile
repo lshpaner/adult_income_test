@@ -381,6 +381,8 @@ predict:
 	done
 
 
+.PHONY: preproc_pipeline_inf
+preproc_pipeline_inf: data_prep_preprocessing_inference feat_gen_inference
 #################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################

@@ -1834,6 +1834,7 @@ def mlflow_load_model(
     experiment_name,
     run_name,
     model_name,
+    mlruns_location: str = None,
 ):
     """
     Load a scikit-learn model from MLflow by experiment and run name.
@@ -1849,7 +1850,10 @@ def mlflow_load_model(
     Raises:
         ValueError: If experiment or run is not found.
     """
-    abs_mlflow_data = os.path.abspath(mlflow_models_data)  # Use models path
+    if mlruns_location is None:
+        abs_mlflow_data = os.path.abspath(mlflow_models_data)
+    else:
+        abs_mlflow_data = os.path.abspath(mlruns_location)
     mlflow.set_tracking_uri(f"file://{abs_mlflow_data}")
 
     # Query MLflow to find the latest run_id for the given run_name in the
@@ -1934,3 +1938,60 @@ def log_mlflow_metrics(
 
         for name, image in images.items():
             mlflow.log_figure(image, name)
+
+
+def find_best_model(
+    experiment_name: str,
+    metric_name: str,
+    mode: str = "max",
+    mlruns_location: str = None,
+) -> str:
+    """
+    Finds the best model from a given MLflow experiment based on a specified
+    metric.
+
+    :param experiment_name: The name of the MLflow experiment to search in.
+    :param metric_name: The metric used to determine the best model.
+    :param mode: Specify "max" to select model based on maximum metric value
+                 or "min" for minimum. Default is "max".
+    :return: The run ID of the best model.
+    :raises ValueError: If the experiment does not exist.
+    """
+    # Get experiment by name
+    if mlruns_location is None:
+        abs_mlflow_data = os.path.abspath(mlflow_models_data)
+    else:
+        abs_mlflow_data = os.path.abspath(mlruns_location)
+    mlflow.set_tracking_uri(f"file://{abs_mlflow_data}")
+
+    experiment = mlflow.get_experiment_by_name(experiment_name)
+    if not experiment:
+        raise ValueError(f"Experiment '{experiment_name}' does not exist.")
+
+    experiment_id = experiment.experiment_id
+
+    # Get all runs for the experiment
+    order_clause = (
+        f"metrics.`{metric_name}` DESC"
+        if mode == "max"
+        else f"metrics.`{metric_name}` ASC"
+    )
+
+    runs = mlflow.search_runs(
+        experiment_ids=[experiment_id],
+        order_by=[order_clause],
+    )
+    if runs.empty:
+        raise ValueError(f"No runs found for experiment '{experiment_name}'")
+    # Return the run ID with the best performance metric
+    best_run = runs.iloc[0]  # Get the best run
+    best_run_id = runs.iloc[0]["run_id"]
+    best_metric_value = runs.iloc[0][f"metrics.{metric_name}"]
+    print(f"Best Run ID: {best_run_id}, Best {metric_name}: {best_metric_value}")
+
+    # Extract model_type from run_name or parameters
+    run_name = best_run["tags.mlflow.runName"]
+
+    # Extract estimator name
+    estimator_name = run_name.split("_")[0]
+    return run_name, estimator_name

@@ -78,7 +78,10 @@ def main(
         print(f"\n{'=' * 80}\ny\n{'=' * 80}\n{y.head()}")
 
         ## Retain numeric columns only
-        X = X.select_dtypes(include=np.number)
+        cols_to_keep = X.select_dtypes(include=np.number).columns.tolist()
+        cols_to_keep.extend(["race", "sex"])
+
+        X = X[cols_to_keep]
 
         ## Clean target column by removing trailing period
         y.loc[:, "income"] = y["income"].str.rstrip(".")
