@@ -1,11 +1,6 @@
 ################################################################################
 ######################### Import Requisite Libraries ###########################
 ################################################################################
-from dotenv import load_dotenv
-_ = load_dotenv(dotenv_path="project.env")  # tells Python linters you expect no return
-
-
-custom_project = os.getenv("PROJECT_NAME")
 
 import pandas as pd
 import numpy as np
@@ -39,7 +34,7 @@ from sklearn.metrics import (
 from sklearn.calibration import calibration_curve
 from tqdm import tqdm
 
-from custom_project.constants import (
+from cookie_project.constants import (
     mlflow_artifacts_data,
     mlflow_models_data,
 )
@@ -326,19 +321,29 @@ def load_variant_data(data_variants, data_path, outcomes_map, return_sets=None):
     # Organize train, valid, and test datasets dynamically based on outcomes_map
     datasets = {
         "X_train": {
-            outcome: X_train_data.get(variant) for outcome, variant in outcomes_map.items()
+            outcome: X_train_data.get(variant)
+            for outcome, variant in outcomes_map.items()
         },
         "X_valid": {
-            outcome: X_valid_data.get(variant) for outcome, variant in outcomes_map.items()
+            outcome: X_valid_data.get(variant)
+            for outcome, variant in outcomes_map.items()
         },
-        "X_test": {outcome: X_test_data.get(variant) for outcome, variant in outcomes_map.items()},
+        "X_test": {
+            outcome: X_test_data.get(variant)
+            for outcome, variant in outcomes_map.items()
+        },
         "y_train": {
-            outcome: y_train_data.get(variant) for outcome, variant in outcomes_map.items()
+            outcome: y_train_data.get(variant)
+            for outcome, variant in outcomes_map.items()
         },
         "y_valid": {
-            outcome: y_valid_data.get(variant) for outcome, variant in outcomes_map.items()
+            outcome: y_valid_data.get(variant)
+            for outcome, variant in outcomes_map.items()
         },
-        "y_test": {outcome: y_test_data.get(variant) for outcome, variant in outcomes_map.items()},
+        "y_test": {
+            outcome: y_test_data.get(variant)
+            for outcome, variant in outcomes_map.items()
+        },
         "outcomes": {
             outcome: {
                 "X_train": X_train_data.get(variant),
@@ -432,7 +437,9 @@ def create_stratified_other_column(
         # Stratify based on age using the provided bins
         stratify_df = (
             pd.cut(
-                X_copy[age].fillna(X_copy[age].mean()),  # Fill missing ages with the mean
+                X_copy[age].fillna(
+                    X_copy[age].mean()
+                ),  # Fill missing ages with the mean
                 bins=bin_ages,  # Use the provided bin_ages
                 right=False,  # Bin intervals are left-inclusive
                 include_lowest=True,  # Include the lowest value in the first bin
@@ -911,7 +918,9 @@ class PlotMetrics:
                 y_prob = df[pred_col]
                 precision, recall, _ = precision_recall_curve(df[outcome_col], y_prob)
                 auc_pr = auc(recall, precision)
-                plt.plot(recall, precision, label=f"{outcome_col} (AUC-PR={auc_pr:.2f})")
+                plt.plot(
+                    recall, precision, label=f"{outcome_col} (AUC-PR={auc_pr:.2f})"
+                )
 
         if models and X_valid is not None and y_valid is not None:
             if model_name:
@@ -938,7 +947,9 @@ class PlotMetrics:
         plt.legend(loc="lower left")
 
         title = (
-            f"{custom_name} - Precision-Recall Curve" if custom_name else "Precision-Recall Curve"
+            f"{custom_name} - Precision-Recall Curve"
+            if custom_name
+            else "Precision-Recall Curve"
         )
 
         plt.title(title)
@@ -1054,9 +1065,13 @@ class PlotMetrics:
                 if use_optimal_threshold:
                     y_pred = model.predict(X_valid, optimal_threshold=True)
                 else:
-                    y_pred = (model.predict_proba(X_valid)[:, 1] > threshold).astype(int)
+                    y_pred = (model.predict_proba(X_valid)[:, 1] > threshold).astype(
+                        int
+                    )
                 cm = confusion_matrix(y_valid, y_pred, normalize=normalize)
-                disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0, 1])
+                disp = ConfusionMatrixDisplay(
+                    confusion_matrix=cm, display_labels=[0, 1]
+                )
                 disp.plot(ax=ax, cmap=cmap, colorbar=False)
 
                 # Add TP, FP, TN, FN labels
@@ -1066,7 +1081,9 @@ class PlotMetrics:
                 for i in range(2):
                     for j in range(2):
                         color = plt.get_cmap(cmap)(norm_cm[i, j])
-                        brightness = color[0] * 0.299 + color[1] * 0.587 + color[2] * 0.114
+                        brightness = (
+                            color[0] * 0.299 + color[1] * 0.587 + color[2] * 0.114
+                        )
                         text_color = "white" if brightness < 0.5 else "black"
 
                         ax.text(
@@ -1080,7 +1097,9 @@ class PlotMetrics:
                         )
             else:
                 for _, model in models.items():
-                    y_pred = (model.predict_proba(X_valid)[:, 1] > threshold).astype(int)
+                    y_pred = (model.predict_proba(X_valid)[:, 1] > threshold).astype(
+                        int
+                    )
                     cm = confusion_matrix(
                         y_valid,
                         y_pred,
@@ -1099,7 +1118,9 @@ class PlotMetrics:
                     for i in range(2):
                         for j in range(2):
                             color = plt.get_cmap(cmap)(norm_cm[i, j])
-                            brightness = color[0] * 0.299 + color[1] * 0.587 + color[2] * 0.114
+                            brightness = (
+                                color[0] * 0.299 + color[1] * 0.587 + color[2] * 0.114
+                            )
                             text_color = "white" if brightness < 0.5 else "black"
 
                             ax.text(
@@ -1113,7 +1134,11 @@ class PlotMetrics:
                             )
 
         if title is None:
-            title = f"{custom_name} - Confusion Matrix" if custom_name else "Confusion Matrix"
+            title = (
+                f"{custom_name} - Confusion Matrix"
+                if custom_name
+                else "Confusion Matrix"
+            )
 
         plt.title(title)
         self._save_plot(title)
@@ -1723,13 +1748,15 @@ def return_model_plots(
             show=False,
         )
 
-        all_plots[f"metrics_thresh_{input_type}.png"] = plotter.plot_metrics_vs_thresholds(
-            models={estimator_name: model},
-            X_valid=X,
-            y_valid=y,
-            custom_name=f"{estimator_name} - Precision, Recall, F1 Score, Specificity vs. Thresholds",
-            scoring=scoring,
-            show=False,
+        all_plots[f"metrics_thresh_{input_type}.png"] = (
+            plotter.plot_metrics_vs_thresholds(
+                models={estimator_name: model},
+                X_valid=X,
+                y_valid=y,
+                custom_name=f"{estimator_name} - Precision, Recall, F1 Score, Specificity vs. Thresholds",
+                scoring=scoring,
+                show=False,
+            )
         )
 
     return all_plots

@@ -2,13 +2,12 @@
 # ------------------------------------------------------------------------------
 # GLOBALS
 # ------------------------------------------------------------------------------
-PROJECT_NAME = custom_project
+PROJECT_NAME = cookie_project
 PYTHON_VERSION = 3.10.12
 PYTHON_INTERPRETER = python
-VENV_DIR = venv
-CONDA_ENV_NAME = conda
-
-PROJECT_DIRECTORY = custom_project
+VENV_DIR = cookie_venv
+CONDA_ENV_NAME = cookie_conda
+PROJECT_DIRECTORY = cookie_project
 
 # ------------------------------------------------------------------------------
 # COMMANDS

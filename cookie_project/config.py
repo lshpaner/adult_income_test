@@ -19,11 +19,11 @@ from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 
-from custom_project.constants import (
+from cookie_project.constants import (
     exp_artifact_name,
     preproc_run_name,
 )
-from custom_project.functions import mlflow_loadArtifact
+from cookie_project.functions import mlflow_loadArtifact
 
 # Load environment variables from .env file if it exists
 load_dotenv()
@@ -178,31 +178,6 @@ pipelines = {
 
 # model_output = "model_output"  # model output path
 # mlflow_data = "mlflow_data"  # path to store mlflow artificats (i.e., results)
-
-################################################################################
-############################# Stratification  ##################################
-################################################################################
-
-# Ages have to be binned carefully because data for a broader span of ages is
-# sparse; these bins were chosen based on current knowledge of distributions
-# with respect to sex and race/ethnicities. Here, we define two primary age groups:
-# (-1 to 65) and (65 to infinity), which reflect meaningful clinical or demographic
-# breakpoints where data density and relevance align with sex and race/ethnicity
-# stratification. The negative lower bound (-1) ensures all ages are captured,
-# while 65 often marks a significant threshold (e.g., elderly population).
-
-bin_ages = [
-    -1,
-    65,
-    np.inf,
-]
-
-stratify_list = [
-    "IsSexFemale",
-    "IsRaceWhite",
-    "IsRaceBlackOrAfricanAmerican",
-    "IsRaceAsian",
-]
 
 ################################################################################
 ########################## Logistic Regression #################################
