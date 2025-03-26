@@ -216,7 +216,7 @@ lr_definition = {
     "estimator_name": lr_name,
     "tuned_parameters": tuned_parameters_lr,
     "randomized_grid": True,
-    "n_iter": 10,
+    "n_iter": 1,
     "early": False,
 }
 
@@ -251,7 +251,7 @@ rf_definition = {
     "estimator_name": rf_name,
     "tuned_parameters": rf_parameters,
     "randomized_grid": True,
-    "n_iter": 10,
+    "n_iter": 1,
     "early": False,
 }
 
@@ -305,7 +305,7 @@ xgb_definition = {
     "estimator_name": xgb_name,
     "tuned_parameters": xgb_parameters,
     "randomized_grid": True,
-    "n_iter": 5,
+    "n_iter": 1,
     "early": True,
 }
 
@@ -352,7 +352,7 @@ cat_definition = {
     "estimator_name": cat_name,
     "tuned_parameters": cat_parameters,
     "randomized_grid": True,
-    "n_iter": 5,
+    "n_iter": 1,
     "early": True,
 }
 

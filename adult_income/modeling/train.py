@@ -23,7 +23,6 @@ from adult_income.functions import (
     adjust_preprocessing_pipeline,
     mlflow_load_model,
 )
-from adult_income.constants import var_index
 
 app = typer.Typer()
 
@@ -87,11 +86,10 @@ def main(
         categorical_cols,
         sampler=sampler,
     )
-    
+
     ################################################################################
     # Step 6. Printing Outcome
     ################################################################################
-
 
     print()
     print(f"Outcome:")
@@ -131,6 +129,7 @@ def main(
             n_iter=n_iter,
             scoring=[scoring],
             random_state=rstate,
+            stratify_cols=["race", "sex"],
             stratify_y=True,
             boost_early=early_stop,
             imbalance_sampler=sampler,
