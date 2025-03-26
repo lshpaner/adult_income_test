@@ -6,18 +6,12 @@ import os
 import typer
 import pandas as pd
 
-# import numpy as np
-
-# print(os.path.join(os.pardir, ".."))
-# sys.path.append(".")
-
 # import pickling scripts
 from model_tuner.pickleObjects import dumpObjects
 
 ################################################################################
 
 from adult_income.constants import (
-    cat_vars,
     var_index,
     preproc_run_name,
     exp_artifact_name,
@@ -139,7 +133,7 @@ def main(
     ############################################################################
 
     if stage == "training":
-        # Get the top 10 most frequent languages
+        # Get the marital status
         marital_status = df["marital-status"]
 
         ############################################################################

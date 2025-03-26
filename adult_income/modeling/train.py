@@ -38,7 +38,7 @@ def main(
     pipeline_type: str = "orig",
     outcome: str = "default_outcome",
     features_path: Path = PROCESSED_DATA_DIR / "X.parquet",
-    labels_path: Path = PROCESSED_DATA_DIR / "y.parquet",
+    labels_path: Path = PROCESSED_DATA_DIR / "y_income.parquet",
     scoring: str = "average_precision",
     pretrained: int = 0,
     # -----------------------------------------
@@ -129,7 +129,7 @@ def main(
             n_iter=n_iter,
             scoring=[scoring],
             random_state=rstate,
-            stratify_cols=["race", "sex"],
+            # stratify_cols=["race"],
             stratify_y=True,
             boost_early=early_stop,
             imbalance_sampler=sampler,

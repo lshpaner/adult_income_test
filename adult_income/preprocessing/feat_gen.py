@@ -81,14 +81,15 @@ def main(
         # Step 5: Retain numeric columns only
         X = X.select_dtypes(include=np.number)
 
-        # Step 7: Clean target column by removing trailing period
-        y["income"] = y["income"].str.rstrip(".")
-
-        # Step 8: Display class balance
-        print(f"\nBreakdown of y:\n{y['income'].value_counts()}\n")
+        # Clean target column by removing trailing period
+        y.loc[:, "income"] = y["income"].str.rstrip(".")
 
         # Step 9: Encode target to binary
         y = y["income"].map({"<=50K": 0, ">50K": 1})
+
+        # Step 8: Display class balance
+        print(f"\nBreakdown of y:\n{y.value_counts()}\n")
+        print(y)
 
         X_columns_list = X.columns.to_list()
 
@@ -127,7 +128,7 @@ def main(
     X_missing.columns = [f"{col}_missing" for col in X.columns]
 
     ############################################################################
-    ################ Step 9: Store Final List of Features for Production #######
+    ################ Step 8: Store Final List of Features for Production #######
     ############################################################################
     if stage == "training":
         # Save feature column names to a pickle file
@@ -156,7 +157,7 @@ def main(
 
     if stage == "training":
         # Target variables from constants.py
-        y = df[[target_outcome]]
+        y = pd.DataFrame(y)
         y.to_parquet(
             os.path.join(data_path, f"y_{target_outcome}.parquet"),
         )

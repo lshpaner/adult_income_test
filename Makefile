@@ -9,6 +9,18 @@ VENV_DIR = adult_venv
 CONDA_ENV_NAME = adult_conda
 PROJECT_DIRECTORY = adult_income
 
+
+############################## Training Globals ################################
+
+# Define variables for looping
+# OUTCOMES = ISDEATHDATElead6mo ISDEATHDATElead1yr
+OUTCOMES = income
+# PIPELINES = orig smote under orig_rfe smote_rfe under_rfe
+PIPELINES = orig under
+SCORING = average_precision
+PRETRAINED ?= 0  # 0 if you want to train the models, 1 if calibrate pretrained
+
+
 # ------------------------------------------------------------------------------
 # COMMANDS
 # ------------------------------------------------------------------------------

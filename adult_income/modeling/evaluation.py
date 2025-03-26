@@ -35,9 +35,9 @@ def main(
     # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
     model_type: str = "lr",
     pipeline_type: str = "orig",
-    outcome: str = "ISDEATHDATElead6mo",
+    outcome: str = "default_outcome",
     features_path: Path = PROCESSED_DATA_DIR / "X.parquet",
-    labels_path: Path = PROCESSED_DATA_DIR / "y_ISDEATHDATElead1yr.parquet",
+    labels_path: Path = PROCESSED_DATA_DIR / "y_income.parquet",
     scoring: str = "average_precision",
     # -----------------------------------------
 ):
