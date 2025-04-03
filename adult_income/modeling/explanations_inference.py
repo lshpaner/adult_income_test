@@ -109,7 +109,7 @@ def main(
     ################################################################################
     # STEP 9: Extract top n SHAP features
     ################################################################################
-    print(f"Extracting Top {top_n} SHAP features per patient...")
+    print(f"Extracting Top {top_n} SHAP features per individual...")
 
     # Get the top n features and their original SHAP values
     top_shap_pairs = shap_results.progress_apply(

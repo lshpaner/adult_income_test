@@ -127,7 +127,7 @@ def main(
     # STEP 10: Extract top n SHAP features (can be top any # based on make command)
     ################################################################################
 
-    print(f"Extracting Top {top_n} SHAP features per patient...")
+    print(f"Extracting Top {top_n} SHAP features per individual...")
 
     # Get the top n features and their original SHAP values
     top_shap_pairs = shap_results.progress_apply(
@@ -139,7 +139,7 @@ def main(
     # STEP 11: Create SHAP DataFrame
     ################################################################################
 
-    # Initialize a DataFrame to store SHAP output per patient
+    # Initialize a DataFrame to store SHAP output per individual
     shap_df = pd.DataFrame(index=X_holdout.index)
 
     if shap_val_flag:
@@ -164,7 +164,7 @@ def main(
     y_pred = model.predict(X_holdout, optimal_threshold=True)
     y_pred_proba = model.predict_proba(X_holdout)[:, 1]
 
-    # Add confusion matrix components for each patient
+    # Add confusion matrix components for each individual
     shap_df["TP"] = ((y_holdout == 1) & (y_pred == 1)).astype(int)
     shap_df["FN"] = ((y_holdout == 1) & (y_pred == 0)).astype(int)
     shap_df["FP"] = ((y_holdout == 0) & (y_pred == 1)).astype(int)
