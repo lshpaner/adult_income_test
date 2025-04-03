@@ -67,6 +67,24 @@ pip install model-tuner
 pip install equiboots
 ```
 
+### ⚠️ Important Setup Instructions
+To use this cookie-cutter template with editable modules:
+
+  Ensure you have a `setup.py` in the root directory of the project. Example:
+
+  ```python
+  # setup.py
+  from setuptools import find_packages, setup
+  
+  setup(
+      name='src',
+      packages=find_packages(),
+      version='0.1.0',
+      description='cookie-cutter data science re-adapted to be used with the `model-tuner`, `eda-toolkit`, and `equiboots` Python libraries.',
+      author='Leonid Shpaner, UCLA CTSI',
+      license='MIT',
+  )
+  ```
 
 Project Organization
 -------------------------
