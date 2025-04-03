@@ -592,50 +592,6 @@ def highlight_null(val):
 
 
 ################################################################################
-##################### Score Column by Outcome Aggregation ######################
-################################################################################
-
-##### Used to inspect death outcomes in supportive_care_eda_preprocessing.ipynb
-
-
-def generate_aggregated_dataframes(df_scores, df_death, score_columns):
-    """
-    Generates aggregated dataframes with sum, mean, and percentage calculations
-    for each grouping column in df_death.
-
-    Parameters:
-    - df_scores (pd.DataFrame): DataFrame containing score columns.
-    - df_death (pd.DataFrame): DataFrame containing columns to group by.
-    - score_columns (list): List of score column names to aggregate in df_scores.
-
-    Returns:
-    - dict: A dictionary where each key is a grouping column from df_death, and
-            each value is the resulting DataFrame with calculated totals and percentages.
-    """
-    # Dictionary to store each resulting DataFrame
-    all_results = {}
-
-    # Loop through each column in df_death to create a separate DataFrame for each
-    for grouping_col in df_death.columns:
-        # Perform grouping and aggregation for each score column
-        aggregations = {score: ["sum", "mean"] for score in score_columns}
-        grouped_custom = df_scores.groupby(df_death[grouping_col]).agg(aggregations).T
-
-        # Calculate totals and percentages
-        grouped_custom["Total"] = grouped_custom[0] + grouped_custom[1]
-        grouped_custom["No Death Percent"] = grouped_custom[0] / grouped_custom["Total"]
-        grouped_custom["Death Percent"] = grouped_custom[1] / grouped_custom["Total"]
-        grouped_custom["Total Percent"] = (
-            grouped_custom["No Death Percent"] + grouped_custom["Death Percent"]
-        ) * 100
-
-        # Store each DataFrame in a dictionary with the column name as the key
-        all_results[grouping_col] = grouped_custom
-
-    return all_results
-
-
-################################################################################
 ########################  Metrics to Store in MLFlow ###########################
 
 ########################### Report Model Metrics ###############################

@@ -16,7 +16,6 @@ from adult_income.constants import (
     miss_col_thresh,
     miss_row_thresh,
     percent_miss,
-    perc_below_indiv,
 )
 
 # import all user-defined functions and constants

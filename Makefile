@@ -13,7 +13,6 @@ PROJECT_DIRECTORY = adult_income
 ############################## Training Globals ################################
 
 # Define variables for looping
-# OUTCOMES = ISDEATHDATElead6mo ISDEATHDATElead1yr
 OUTCOMES = income
 # PIPELINES = orig smote under orig_rfe smote_rfe under_rfe
 PIPELINES = orig under
@@ -181,7 +180,7 @@ preproc_pipeline: data_prep_preprocessing_training feat_gen_training
 
 ################################################################################
 ################################# Training #####################################
-#################### Supportive Care RFE, Imb Learn Models #####################
+########################## RFE, Imb Learn Models ###############################
 ################################################################################
 
 train_logistic_regression:

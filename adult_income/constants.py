@@ -18,7 +18,6 @@ data_path = "data/processed/"
 
 
 # One Hot Encoded Vars to Be Omitted
-# Already one-hot encoded by data engineering team
 cat_vars = []
 
 

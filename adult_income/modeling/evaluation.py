@@ -7,7 +7,7 @@ import numpy as np
 # Import necessary modules from custom libraries
 from model_tuner import find_optimal_threshold_beta
 
-# Import supportive care functions and constants
+# Import functions and constants
 from adult_income.functions import (
     mlflow_load_model,
     return_model_metrics,
