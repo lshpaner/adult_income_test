@@ -1,10 +1,75 @@
-custom_project
-==============================
+Cookie Model Documentation (README)
+=========================================
 
-cookie-cutter data science re-adapted to be used with the `model_tuner` library.
+A cookie-cutter template integrating **EDA**, **model development**, and **fairness auditing**. This project enables fast and reproducible experimentation using the `model-tuner`, `eda-toolkit`, and `equiboots` Python libraries.
+
+---
+
+## Project Objective
+
+To develop and evaluate a binary classifier that predicts whether an individual earns over $50K/year using the **UCI Adult Income Dataset**, while tracking performance and identifying bias across sensitive attributes.
+
+---
+
+## Dataset Summary
+
+***Note:*** This is an example dataset included in the project for posterity and reproducibility. It provides a standardized baseline to illustrate the toolkit’s full workflow, from preprocessing to fairness auditing.
+
+- **Dataset**: UCI Adult Income Dataset
+- **Source**: UCI Machine Learning Repository  
+- **Goal**: Predict income >$50K  
+- **Sample Size**: ~48,000 adults (1994 US Census)  
+- **Features**: Age, education, occupation, race, gender, hours worked, etc.  
+- **Task Type**: Binary classification
+
+---
+
+## Key Features
+
+### Initial Setup
+
+- Predefined directory structure for easy replication
+- Standardized preprocessing steps:
+  - Remove zero-variance features
+  - Handle missing values
+  - Create missingness indicators
+  - Feature engineering
+
+### Modeling (via `model-tuner`)
+
+- Supports `logistic regression`, `random forest`, `xgboost`, `catboost`
+- Built-in:
+  - Custom hyperparameter tuning (grid/random search)
+  - Train/test/val split or k-fold
+  - Early stopping
+  - Model calibration
+  - MLflow logging
+
+### Evaluation
+
+- All metrics automatically logged to **MLflow**
+- Easy threshold selection based on precision-recall targets
+- SHAP value analysis for model explainability
+
+### Fairness Analysis (via `equiboots`)
+
+- Disparity analysis across sensitive features (e.g., race, sex)
+- Bootstrapped comparisons and pointwise metrics
+- Visualizations: Violin plots, ROC disparities, etc.
+
+---
+
+## Installation
+
+```bash
+pip install eda-toolkit
+pip install model-tuner
+pip install equiboots
+```
+
 
 Project Organization
-------------
+-------------------------
 
     ├── LICENSE
     ├── Makefile           <- Makefile with commands like `make data` or `make train`
@@ -32,24 +97,7 @@ Project Organization
     │                         generated with `pip freeze > requirements.txt`
     │
     ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
-    │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
+    └── 
 
 
 --------
