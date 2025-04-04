@@ -81,7 +81,7 @@ To use this cookie-cutter template with editable modules:
       packages=find_packages(),
       version='0.1.0',
       description='cookie-cutter data science re-adapted to be used with the `model-tuner`, `eda-toolkit`, and `equiboots` Python libraries.',
-      author='Leonid Shpaner, UCLA CTSI',
+      author='Leonid Shpaner, Arthur Funnell, Panayiotis Petousis, UCLA CTSI',
       license='MIT',
   )
   ```

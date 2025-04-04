@@ -1,10 +1,10 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='src',
+    name="src",
     packages=find_packages(),
-    version='0.1.0',
-    description='cookie-cutter data science re-adapted to be used with the `model_tuner` library.',
-    author='Leonid Shpaner, UCLA CTSI',
-    license='MIT',
+    version="0.1.0",
+    description="cookie-cutter data science re-adapted to be used with the `model_tuner` library.",
+    author="Leonid Shpaner, Arthur Funnell, Panayiotis Petousis, UCLA CTSI",
+    license="MIT",
 )
