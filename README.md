@@ -64,9 +64,7 @@ This repository provides a reusable, cookie-cutter-style template for developing
 ## Installation
 
 ```bash
-pip install eda-toolkit
-pip install model-tuner
-pip install equiboots
+pip install -r requirements.txt
 ```
 
 ### ⚠️ Important Setup Instructions
