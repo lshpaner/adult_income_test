@@ -7,7 +7,9 @@ A cookie-cutter template integrating **EDA**, **model development**, and **fairn
 
 ## Project Objective
 
-To develop and evaluate a binary classifier that predicts whether an individual earns over $50K/year using the **UCI Adult Income Dataset**, while tracking performance and identifying bias across sensitive attributes.
+This repository provides a reusable, cookie-cutter-style template for developing machine learning workflows that integrate **exploratory data analysis (EDA), model development, and fairness auditing**. It is designed to streamline experimentation and support reproducible pipelines using the **model-tuner**, **eda-toolkit**, and **equiboots** Python libraries.
+
+> A sample binary classification task (UCI Adult Income Dataset) is included to demonstrate the template’s end-to-end capabilities.
 
 ---
 
