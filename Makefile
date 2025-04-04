@@ -127,18 +127,13 @@ clean:
 #################################################################################
 # PROJECT RULES                                                                 #
 #################################################################################
-
-################################################################################
-####################### Preprocessing (+) Dataprep Pipeline ####################
-################################################################################
 # clean directories
 clean_dir:
 	@echo "Cleaning directory..."
 	rm -rf data/
 
-################################################################################
-################################ Folder Creation  ##############################
-################################################################################
+
+# Folder Creation 
 
 .PHONY: create_folders
 create_folders:
@@ -157,9 +152,11 @@ create_folders:
 		mkdir -p models/eval/$$outcome; \
 	done
 
-## Replace <your_project_dir> with actual path to your preprocessing script
-## Replace <raw_input_filename> with the name of the raw input file
-## Replace <cleaned_output_filename> with the name of the cleaned output file
+################################################################################
+################################### Training ###################################
+####################### Preprocessing (+) Dataprep Pipeline ####################
+################################################################################
+
 .PHONY: data_prep_preprocessing_training
 data_prep_preprocessing_training:
 	$(PYTHON_INTERPRETER) $(PROJECT_DIRECTORY)/preprocessing/preprocessing.py \
@@ -250,7 +247,7 @@ train_catboost:
 train_all_models: train_logistic_regression train_random_forest train_xgboost train_catboost
 
 ################################################################################
-############################## Model Evaluation ################################
+############################### Model Evaluation ###############################
 ################################################################################
 
 eval_logistic_regression:
@@ -380,6 +377,9 @@ predict:
 	done
 
 
+################################################################################
+###################### Preprocessing (+) Inference Pipeline ####################
+################################################################################
 .PHONY: preproc_pipeline_inf
 preproc_pipeline_inf: data_prep_preprocessing_inference feat_gen_inference
 #################################################################################
